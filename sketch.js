@@ -10,6 +10,7 @@ let volumeSlider;
 let freqSlider;
 let bandWidth;
 let colorSlider;
+let bandSlider;
 let rotateSlider;
 let rotateCheckbox;
 
@@ -53,7 +54,7 @@ function togglePlaying() {
 
 const createListeners = () => {
   const progressBar = document.getElementById('progress-bar');
-  progressBar.addEventListener("mousedown", function(e){
+  progressBar.addEventListener("mousedown", function(e) {
     let clickedPos = e.clientX - e.target.offsetLeft;
     song.jump((clickedPos / e.target.offsetWidth) * song.duration());
   }, false);
@@ -66,12 +67,18 @@ const createButtons = () => {
 }
 
 const createSliders = () => {
-  colorSlider = createSlider(0, 360, 0, 1);
-  colorSlider.addClass('control slider');
-  colorSlider.id('color-slider');
   volumeSlider = createSlider(0, 0.5, 0.25, 0.0125);
   volumeSlider.addClass('control slider');
   volumeSlider.id('volume-slider');
+  colorSlider = createSlider(0, 360, 0, 1);
+  colorSlider.addClass('control slider');
+  colorSlider.id('color-slider');
+  bandSlider = createSlider(0, 3, 0, 1);
+  bandSlider.addClass('control slider');
+  bandSlider.id('band-slider');
+  offsetSlider = createSlider(10, 100, 0, 5);
+  offsetSlider.addClass('control slider');
+  offsetSlider.id('offset-slider');
   bandWidth = createSlider(2, 64, 16, 2);
   bandWidth.addClass('control slider');
   bandWidth.id('bandWidth-slider');
@@ -98,6 +105,30 @@ const jumpSong = (len = song.duration()) => {
   song.jump(t);
 }
 
+const drawCircleWave = () => {
+
+}
+
+const drawCircle = () => {
+  const vol = amp.getLevel();
+  volData.push(vol);
+  stroke(255);
+  noFill();
+
+  push();
+  translate(width / 2, height / 2);
+  beginShape();
+
+  for (let i = 0; i < volData.length; i++) {
+    const y = map(volData[i], 0, 0.25, height / 2, 0);
+    vertex(i + 200, y);
+  }
+  
+  endShape();
+  pop();
+  if (volData.length > 360) volData.splice(0, 1);
+}
+
 const drawLine = () => {
   const vol = amp.getLevel();
   volData.push(vol);
@@ -112,6 +143,36 @@ const drawLine = () => {
   endShape();
   if (volData.length > width - 400) volData.splice(0, 1);
 }
+
+const drawLineWave = () => {
+  const wave = fft.waveform();
+  const bw = bandWidth.value();
+  noFill();
+  strokeWeight(bw);
+  push();
+  translate(width / 2, height / 2);
+  rotate(rotateSlider.value() + theta);
+  for (let i = 0; i < wave.length; i++) {
+    const y = map(wave[i], -1, 1, -height / 2, height / 2);
+    const c = map(i, 0, wave.length, 0, 255);
+    const color = (c + colorSlider.value()) % 255;
+    stroke(color, 255, 255);
+    
+    point(i, y);
+    point(-i, y);
+
+    const numBands = bandSlider.value();
+    const offset = offsetSlider.value();
+    for (let j = 0; j < numBands; j++) {
+      point(i, j * offset + y);
+      point(i, -j * offset + y);
+      point(-i, j * offset + y);
+      point(-i, -j * offset + y);
+    }
+  }
+  pop();
+}
+
 
 const drawLineFFT = () => {
   const spectrum = fft.analyze();
@@ -136,8 +197,10 @@ const drawLineFFT = () => {
 }
 
 
+
+
 const createFFT = () => {
-  fft = new p5.FFT(0.90, 1024);
+  fft = new p5.FFT(0.90, 512);
 }
 
 const drawSpectrum = () => {
@@ -196,7 +259,6 @@ const renderRipples = () => {
   current = temp;
 }
 
-
 const cycles = () => {
   if (rotateCheckbox.checked()) theta += omega;
 }
@@ -223,6 +285,7 @@ function setup() {
   angleMode(DEGREES);
   colorMode(HSB);
   background(0);
+
   createFFT();
   createRipple();
   structureMe();
@@ -234,8 +297,9 @@ function draw() {
   checkAndReset();
   // renderRipples();
   // drawLine();
-  drawLineFFT();
+  // drawLineFFT();
   // drawSpectrum();
+  drawLineWave();
 }
 
 const moveSketch = () => {

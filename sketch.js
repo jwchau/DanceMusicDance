@@ -2,29 +2,24 @@
 const songs = {};
 let song;
 
-//part 1
-let amp;
+//controls
 let playButton;
-let jumpButton;
 let volumeSlider;
-
-//part 2
-let wave;
 let freqSlider;
-let envelope;
-let mic;
-
-//part 3
-let fft;
 let bandWidth;
 let colorSlider;
+let rotateSlider;
 
-//part 4
+//music analysis
+let amp;
+let fft;
+
+//ripple
 let cols;
 let rows;
 let current; // = new float[cols][rows];
 let previous; // = new float[cols][rows];
-let dampening = 0.95;
+let dampening = 0.99;
 
 //init data
 const volData = [0];
@@ -53,14 +48,40 @@ function togglePlaying() {
   }
 }
 
-function createControls() {
+const createListeners = () => {
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.addEventListener("mousedown", function(e){
+    let clickedPos = e.clientX - e.target.offsetLeft;
+    song.jump((clickedPos / e.target.offsetWidth) * song.duration());
+  }, false);
+}
+
+const createButtons = () => {
   playButton = createButton("play");
   playButton.mousePressed(togglePlaying);
-  // jumpButton = createButton("jump");
-  // jumpButton.mousePressed(jumpSong);
+  playButton.addClass('control button');
+}
+
+const createSliders = () => {
   colorSlider = createSlider(0, 360, 0, 1);
+  colorSlider.addClass('control slider');
+  colorSlider.id('color-slider');
   volumeSlider = createSlider(0, 0.5, 0.25, 0.0125);
+  volumeSlider.addClass('control slider');
+  volumeSlider.id('volume-slider');
   bandWidth = createSlider(2, 64, 16, 2);
+  bandWidth.addClass('control slider');
+  bandWidth.id('bandWidth-slider');
+  rotateSlider = createSlider(0, 360, 0, 1);
+  rotateSlider.addClass('control slider');
+  rotateSlider.id('rotate-slider');
+}
+
+function createControls() {
+  createButtons();
+  createSliders();
+  createListeners();
+
   amp = new p5.Amplitude();
 }
 
@@ -69,8 +90,6 @@ const jumpSong = (len = song.duration()) => {
   console.log(t);
   song.jump(t);
 }
-
-
 
 const drawLine = () => {
   const vol = amp.getLevel();
@@ -93,7 +112,7 @@ const drawLineFFT = () => {
   strokeWeight(10);
   push();
   translate(width / 2, height / 2);
-  rotate(-90);
+  rotate(rotateSlider.value());
   for (let i = 0; i < spectrum.length; i += bw) {
     const amp = spectrum[i];
     const x = map(i, 0, spectrum.length, -width / 2, width / 2 );
@@ -118,14 +137,18 @@ const drawSpectrum = () => {
   const spectrum = fft.analyze();
   const bw = bandWidth.value();
   noStroke();
+  push();
+  translate(width / 2, height / 2);
+  rotate(rotateSlider.value());
   for (let i = 0; i < spectrum.length; i += bw) {
     const amp = spectrum[i];
     const y = map(amp, 0, 256, height, 0);
     const c = map(i, 0, spectrum.length, 0, 360);
     const color = (c + colorSlider.value()) % 360;
     fill(color, 255, 255);
-    rect(i, y, bw, height - y);
+    rect(i, -y, bw, height - y);
   }
+  pop();
 }
 
 const createRipple = () => {
@@ -174,30 +197,44 @@ function mouseDragged() {
 
 function setup() {
   pixelDensity(1);
-  createCanvas(800, 800);
-  structureMe();
+  createCanvas(windowWidth - 200, windowHeight - 200);
+  createControls();
   angleMode(DEGREES);
   colorMode(HSB);
   background(0);
-  createControls();
   createFFT();
   createRipple();
+  structureMe();
 }
 
 function draw() {
   song.setVolume(volumeSlider.value());
   background(0);
-  renderRipples();
+  // renderRipples();
   // drawLine();
-  drawLineFFT();
-  // drawSpectrum();
+  // drawLineFFT();
+  drawSpectrum();
+}
+
+const moveSketch = () => {
+  const canvas = document.getElementById('defaultCanvas0');
+  const div = document.getElementById('sketch');
+  div.appendChild(canvas);
+}
+
+const moveControls = (parent, children) => {
+  //all controls
+  const div = document.getElementById(parent);
+  const arr = document.getElementsByClassName(children);
+  for (let i = 0; i < arr.length; i++) {
+    const a = arr[i];
+    div.appendChild(a);
+  }
 }
 
 const structureMe = () => {
-  const canvas = document.getElementById('defaultCanvas0');
-  const div = document.createElement('div');
-  div.classList.add('sketch');
-  div.appendChild(canvas);
-  document.body.appendChild(div);
+  moveSketch();
+  moveControls('sliders', 'slider');
+  moveControls('buttons', 'button');
 }
 

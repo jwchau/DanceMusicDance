@@ -194,5 +194,3 @@ const s = (sketch) => {
   }
 
 }
-
-export default s;

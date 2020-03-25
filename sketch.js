@@ -89,6 +89,9 @@ const createSliders = () => {
 
 const createCheckboxes = () => {
   rotateCheckbox = createCheckbox('auto-rotate', false);
+  barsCheckbox = createCheckbox('Bars', false);
+  FFTLineCheckbox = createCheckbox('FFT Line', false);
+  pointWaveCheckbox = createCheckbox('Point Wave', false);
 }
 
 function createControls() {
@@ -123,7 +126,7 @@ const drawCircle = () => {
     const y = map(volData[i], 0, 0.25, height / 2, 0);
     vertex(i + 200, y);
   }
-  
+
   endShape();
   pop();
   if (volData.length > 360) volData.splice(0, 1);
@@ -144,7 +147,7 @@ const drawLine = () => {
   if (volData.length > width - 400) volData.splice(0, 1);
 }
 
-const drawLineWave = () => {
+const pointWave = () => {
   const wave = fft.waveform();
   const bw = bandWidth.value();
   noFill();
@@ -203,7 +206,7 @@ const createFFT = () => {
   fft = new p5.FFT(0.90, 512);
 }
 
-const drawSpectrum = () => {
+const bars = () => {
   const spectrum = fft.analyze();
   const bw = bandWidth.value();
   noStroke();
@@ -297,9 +300,9 @@ function draw() {
   checkAndReset();
   // renderRipples();
   // drawLine();
-  // drawLineFFT();
-  // drawSpectrum();
-  drawLineWave();
+  if (FFTLineCheckbox.checked()) drawLineFFT();
+  if (barsCheckbox.checked()) bars();
+  if (pointWaveCheckbox.checked()) pointWave();
 }
 
 const moveSketch = () => {

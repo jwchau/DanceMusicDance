@@ -1,6 +1,8 @@
 //globals
 const songs = {};
 let song;
+let theta = 0;
+let omega = 1;
 
 //controls
 let playButton;
@@ -9,6 +11,7 @@ let freqSlider;
 let bandWidth;
 let colorSlider;
 let rotateSlider;
+let rotateCheckbox;
 
 //music analysis
 let amp;
@@ -77,11 +80,15 @@ const createSliders = () => {
   rotateSlider.id('rotate-slider');
 }
 
+const createCheckboxes = () => {
+  rotateCheckbox = createCheckbox('auto-rotate', false);
+}
+
 function createControls() {
   createButtons();
+  createCheckboxes();
   createSliders();
   createListeners();
-
   amp = new p5.Amplitude();
 }
 
@@ -109,21 +116,21 @@ const drawLine = () => {
 const drawLineFFT = () => {
   const spectrum = fft.analyze();
   const bw = bandWidth.value();
-  strokeWeight(10);
+  strokeWeight(bw);
   push();
   translate(width / 2, height / 2);
-  rotate(rotateSlider.value());
+  rotate(rotateSlider.value() + theta);
   for (let i = 0; i < spectrum.length; i += bw) {
     const amp = spectrum[i];
-    const x = map(i, 0, spectrum.length, -width / 2, width / 2 );
+    const x = map(i, 0, spectrum.length, -width / 2 + 100, 0);
     const y = map(amp, 0, 256, 0, -height / 2);
     const c = map(i, 0, spectrum.length, 0, 255);
     const color = (c + colorSlider.value()) % 255;
     stroke(color, 255, 255);
     point(x, y);
     point(x, -y);
-    // drawRipples(x,y);
-    // drawRipples(x,-y);
+    point(-x, y);
+    point(-x, -y);
   }
   pop();
 }
@@ -139,14 +146,18 @@ const drawSpectrum = () => {
   noStroke();
   push();
   translate(width / 2, height / 2);
-  rotate(rotateSlider.value());
+  rotate(rotateSlider.value() + theta);
   for (let i = 0; i < spectrum.length; i += bw) {
     const amp = spectrum[i];
-    const y = map(amp, 0, 256, height, 0);
+    const x = map(i, 0, spectrum.length, -width / 2 + 100, 0);
+    const y = map(amp, 0, 256, 0, height - 100);
     const c = map(i, 0, spectrum.length, 0, 360);
     const color = (c + colorSlider.value()) % 360;
     fill(color, 255, 255);
-    rect(i, -y, bw, height - y);
+    rect(x, 0, bw, y);
+    rect(x, 0, bw, -y);
+    rect(-x, 0, bw, y);
+    rect(-x, 0, bw, -y);
   }
   pop();
 }
@@ -185,6 +196,16 @@ const renderRipples = () => {
   current = temp;
 }
 
+
+const cycles = () => {
+  if (rotateCheckbox.checked()) theta += omega;
+}
+
+const checkAndReset = () => {
+  if (theta > 360) theta = 0;
+  cycles();
+}
+
 const drawRipples = (x,y) => {
   previous[x][y] = 1000;
 }
@@ -210,10 +231,11 @@ function setup() {
 function draw() {
   song.setVolume(volumeSlider.value());
   background(0);
+  checkAndReset();
   // renderRipples();
   // drawLine();
-  // drawLineFFT();
-  drawSpectrum();
+  drawLineFFT();
+  // drawSpectrum();
 }
 
 const moveSketch = () => {
@@ -236,5 +258,6 @@ const structureMe = () => {
   moveSketch();
   moveControls('sliders', 'slider');
   moveControls('buttons', 'button');
+  moveControls('checkboxes', 'checkbox');
 }
 

@@ -140,7 +140,7 @@ function createControls() {
   amp = new p5.Amplitude();
 }
 
-const drawBeziersType0 = (diam, offset, dist) => {
+const drawBeziersType0 = (diam, offset) => {
   let p1 = [diam / 6, diam / 2];
   let p2 = [diam / 6, offset + diam / 2];
   let p3 = [diam / 12, 2 * offset + diam / 2];
@@ -155,14 +155,15 @@ const drawBeziersType0 = (diam, offset, dist) => {
 
 const drawType0 = (diam, offset, ang, dist) => {
   push();
+  const size = map(amp.getLevel(), 0, 1, 0, diam / 2);
   translate(width / 2, height / 2);
-  ellipse(0, 0, dist / 2, dist / 2);
+  ellipse(0, 0, (size + dist) / 2, (size + dist) / 2);
   rotate(theta + rotateSlider.value() + ang);
   for (let i = 0; i < 3; i++) {
     rotate(120);
     fill(colorMe(0), 255, 255);
-    ellipse(0, dist / 4, diam / 6, diam / 6);
-    drawBeziersType0(diam / 2, offset, dist / 2);
+    ellipse(0, dist / 4, size + diam / 6, size + diam / 6);
+    drawBeziersType0(size + dist / 2, offset);
   }
   pop();
 }
@@ -197,7 +198,7 @@ const drawChaos = (start) => {
       for (let i = 0; i < 360; i++) {
         const magicNumber = Math.floor(i * (512 / 360)) + 1;
         const variance = offsetSlider.value() * 1.5;
-        const r = map(wave[magicNumber], 0, 1, start, start + ((bandSlider.value() + 1) * variance));
+        const r = map(wave[magicNumber], -1, 1, start, start + ((bandSlider.value() + 1) * variance));
         const x = r * cos(i);
         const y = r * sin(i);
         vertex(x, y);

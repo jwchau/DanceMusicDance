@@ -1,7 +1,7 @@
 //globals
 const songs = [];
 let song;
-let songIdx = Math.floor(Math.random() * 4);
+let songIdx;
 let theta = 0;
 let cTheta = 0;
 let omega = 1;
@@ -42,6 +42,7 @@ function preload() {
     songs.push(song);
     songs[i].setVolume(0.125);
   }
+  songIdx = Math.floor(Math.random() * songs.length);
   song = songs[songIdx];
 }
 
@@ -118,6 +119,8 @@ const createCheckboxes = () => {
   rotateCheckbox.parent(div);
   cycleColors = createCheckbox('cycle colors', false);
   cycleColors.parent(div);
+  drawCircleCheckbox = createCheckbox('Radial Map', false);
+  drawCircleCheckbox.parent(div);
   barsCheckbox = createCheckbox('Bars', false);
   barsCheckbox.parent(div);
   FFTLineCheckbox = createCheckbox('FFT Line', false);
@@ -135,44 +138,71 @@ function createControls() {
   amp = new p5.Amplitude();
 }
 
-const drawCircleWave = () => {
+// const drawCircleLines = () => {
+//   const wave = fft.waveform();
+//   noFill();
+//   strokeWeight(bandWidth.value());
+//   push();
+//   translate(width / 2, height / 2);
+//   rotate(theta + rotateSlider.value());
+  
+//   for (let i = 0; i < wave.length; i++) {
+//     const r = map(wave[i], 0, 1, 1, height);
+//     const x = r * cos(i);
+//     const y = r * sin(i);
+//     const angle = map(i, 0, 512, 0, 360);
+//     const c = map(i, 0, wave.length, 0, 255);
+//     const offset = 10 * offsetSlider.value();
+//     stroke(colorMe(c), 255, 255);
+//     push();
+//     rotate(angle);
+//     line(offset, 0, x + offset, y);
+//     pop();
+//   }
+//   pop();
+// }
+
+const drawCircleLines = () => {
+  const vol = amp.getLevel();
+  const offset = 10 * offsetSlider.value();
+  noFill();
+  strokeWeight(bandWidth.value());
+  push();
+  translate(width / 2, height / 2);
+  rotate(theta + rotateSlider.value());
+  for (let i = 0; i < 360; i++) {
+    const r = map(vol, 0, 0.25, 10 + (1.5 * offsetSlider.value()), height);
+    const x = r * cos(i);
+    const y = r * sin(i);
+    const c = map(i, 0, 360, 0, 255);
+    stroke(colorMe(c), 255, 255);
+    line(0, 0, x, y);
+  }
+  pop();
 
 }
 
 const drawCircle = () => {
   const vol = amp.getLevel();
   volData.push(vol);
-  stroke(255);
   noFill();
-
+  strokeWeight(bandWidth.value());
+  stroke(colorMe(0), 255, 255);
   push();
   translate(width / 2, height / 2);
+  rotate(theta + rotateSlider.value());
   beginShape();
   for (let i = 0; i < volData.length; i++) {
-    const r = map(volData[i], 0, 1, 100, height * 0.666);
+    const r = map(volData[i], 0, 0.25, 10 + (1.5 * offsetSlider.value()), height);
     const x = r * cos(i);
     const y = r * sin(i);
+    const c = map(i, 0, volData.length, 0, 255);
     vertex(x, y);
   }
   endShape();
   pop();
 
   if (volData.length > 360) volData.splice(0, 1);
-}
-
-const drawLine = () => {
-  const vol = amp.getLevel();
-  volData.push(vol);
-  stroke(255);
-  noFill();
-
-  beginShape();
-  for (let i = 0; i < volData.length; i++) {
-    const y = map(volData[i], 0, 0.25, height / 2, 0);
-    vertex(i + 200, y);
-  }
-  endShape();
-  if (volData.length > width - 400) volData.splice(0, 1);
 }
 
 const pointWave = () => {
@@ -186,7 +216,7 @@ const pointWave = () => {
   for (let i = 0; i < wave.length; i += bw) {
     const y = map(wave[i], -1, 1, -height / 2, height / 2);
     const c = map(i, 0, wave.length, 0, 255);
-    const color = colorMe(c, 255);
+    const color = colorMe(c);
     stroke(color, 255, 255);
     
     point(i, y);
@@ -219,7 +249,7 @@ const drawLineFFT = () => {
     const x = map(i, 0, spectrum.length, -width / 2 + 100, 0);
     const y = map(amp, 0, 256, 0, -height / 2);
     const c = map(i, 0, spectrum.length, 0, 255);
-    const color = colorMe(c, 255);
+    const color = colorMe(c);
     stroke(color, 255, 255);
     point(x + (mult * offset), y);
     point(x + (mult * offset), -y);
@@ -248,7 +278,7 @@ const bars = () => {
     const x = map(i, 0, spectrum.length, -width / 2, 0);
     const y = map(amp, 0, 256, 1, height - 100);
     const c = map(i, 0, spectrum.length, 0, 255);
-    const color = colorMe(c, 255);
+    const color = colorMe(c);
     fill(color, 255, 255);
     rect(x, 0, bw, y);
     rect(x, 0, bw, -y);
@@ -258,13 +288,18 @@ const bars = () => {
   pop();
 }
 
-const colorMe = (current, max) => {
-  return current + colorSlider.value() + cTheta % max;
+const colorMe = (current) => {
+  return (current + colorSlider.value() + cTheta) % 256;
 }
 
 const cycles = () => {
   if (rotateCheckbox.checked()) theta += omega;
   if (cycleColors.checked()) cTheta += cOmega;
+}
+
+const colorProgressBar = () => {
+  const progress = document.getElementById('progress');
+  progress.style.width = `${(song.currentTime() / song.duration()) * 100}%`;
 }
 
 const checkAndReset = () => {
@@ -289,10 +324,11 @@ function setup() {
 
 function draw() {
   song.setVolume(volumeSlider.value());
+  colorProgressBar();
   background(0);
   checkAndReset();
-  // drawLine();
-  drawCircle();
+  drawCircleLines();
+  if (drawCircleCheckbox.checked()) drawCircle();
   if (FFTLineCheckbox.checked()) drawLineFFT();
   if (barsCheckbox.checked()) bars();
   if (pointWaveCheckbox.checked()) pointWave();

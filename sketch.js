@@ -113,12 +113,13 @@ const createSliders = () => {
 }
 
 const createCheckboxes = () => {
-  const div = document.createElement('div');
-  div.className = 'checkboxes';
+  const div = document.getElementById('checkboxes');
   rotateCheckbox = createCheckbox('auto-rotate', false);
   rotateCheckbox.parent(div);
   cycleColors = createCheckbox('cycle colors', false);
   cycleColors.parent(div);
+  radialPatternCheckbox = createCheckbox('Radial Pattern', false);
+  radialPatternCheckbox.parent(div);
   radialWaveCheckbox = createCheckbox('Radial Wave', false);
   radialWaveCheckbox.parent(div);
   drawCircleCheckbox = createCheckbox('Radial Map', false);
@@ -155,15 +156,41 @@ const drawBeziersType0 = (diam, offset) => {
 
 const drawType0 = (diam, offset, ang, dist) => {
   push();
-  const size = map(amp.getLevel(), 0, 1, 0, diam / 2);
+  const wave = fft.waveform();
+  const size = map(wave[69], 0, 1, 0, 100);
   translate(width / 2, height / 2);
   ellipse(0, 0, (size + dist) / 2, (size + dist) / 2);
   rotate(theta + rotateSlider.value() + ang);
   for (let i = 0; i < 3; i++) {
+    const size = map(wave[i * 120], 0, 1, 0, 75);
     rotate(120);
     fill(colorMe(0), 255, 255);
     ellipse(0, dist / 4, size + diam / 6, size + diam / 6);
     drawBeziersType0(size + dist / 2, offset);
+  }
+  pop();
+}
+
+const drawType2 = (diam, offset) => {
+  push();
+  noFill();
+  const wave = fft.waveform();
+  const size = map(wave[69], 0, 1, 0, 100);
+  translate(width / 2, height / 2);
+  ellipse(0, 0, (size + diam) / 2, (size + diam) / 2);
+  ellipse(0, 0, (size + diam), (size + diam));
+  rotate(theta + rotateSlider.value());
+  for (let i = 0; i < 3; i++) {
+    const size = map(wave[i * 120], 0, 1, 0, 25);
+    rotate(120);
+    ellipse(0, diam / 4, size + diam / 6, size + diam / 6);
+    push();
+    rotate(60);
+    rectMode(RADIUS);
+    rect(0, diam / 2, size + diam / 8, size + diam / 4, size + diam / 4);
+    rectMode(CORNER);
+    pop();
+    drawBeziersType0(diam, size + offset);
   }
   pop();
 }
@@ -176,6 +203,8 @@ const drawEyeType = (type, diam) => {
     for (let i = 0; i < 3; i++) {
       drawType0(diam, offset, i * 60, diam * (i + 1));
     }
+  } else if (type === 2) {
+    drawType2(diam, offset);
   }
 
 }
@@ -343,6 +372,7 @@ const colorProgressBar = () => {
 }
 
 const checkAndReset = () => {
+  if (!song.isPlaying()) playButton.html('play');
   if (theta > 360) theta = 0;
   if (cTheta >= 255) cOmega = -1;
   if (cTheta <= 0) cOmega = 1;
@@ -352,13 +382,14 @@ const checkAndReset = () => {
 
 function setup() {
   pixelDensity(1);
-  createCanvas(windowHeight - 200, windowHeight - 200);
+  createCanvas(windowHeight - 100, windowHeight - 100);
   angleMode(DEGREES);
   colorMode(HSB);
   background(0);
   
   createControls();
   createFFT();
+  fileUpload();
   structureMe();
 }
 
@@ -367,7 +398,7 @@ function draw() {
   colorProgressBar();
   background(0);
   checkAndReset();
-  nerdOut();
+  if (radialPatternCheckbox.checked()) nerdOut();
   if (radialWaveCheckbox.checked()) drawCircleLines();
   if (drawCircleCheckbox.checked()) drawCircle();
   if (FFTLineCheckbox.checked()) drawLineFFT();
@@ -405,8 +436,16 @@ const structureMe = () => {
   attachById('offset-label', 'offset-slider');
   attachById('bandWidth-label', 'bandWidth-slider');
   attachById('rotate-label', 'rotate-slider');
+  
+  attachById('controls', 'checkboxes');
 
   attachByClass('buttons', 'button');
-  attachByClass('checkboxes', 'checkbox');
 }
 
+const fileUpload = () => {
+  document.getElementById('input').onchange = function(e){
+    if (this.files[0] === undefined) return;
+    song.stop();
+    song = loadSound(URL.createObjectURL(this.files[0]));
+  }
+}

@@ -119,6 +119,8 @@ const createCheckboxes = () => {
   rotateCheckbox.parent(div);
   cycleColors = createCheckbox('cycle colors', false);
   cycleColors.parent(div);
+  radialWaveCheckbox = createCheckbox('Radial Wave', false);
+  radialWaveCheckbox.parent(div);
   drawCircleCheckbox = createCheckbox('Radial Map', false);
   drawCircleCheckbox.parent(div);
   barsCheckbox = createCheckbox('Bars', false);
@@ -138,25 +140,34 @@ function createControls() {
   amp = new p5.Amplitude();
 }
 
-const drawCircleLines = () => {
+const drawChaos = (start) => {
   const wave = fft.waveform();
+  push();
+    rotate((start / 50) * 90);
+    beginShape();
+      for (let i = 0; i < 360; i++) {
+        const magicNumber = Math.floor(i * (512 / 360)) + 1;
+        const variance = offsetSlider.value() * 1.5;
+        const r = map(wave[magicNumber], 0, 1, start, start + ((bandSlider.value() + 1) * variance));
+        const x = r * cos(i);
+        const y = r * sin(i);
+        vertex(x, y);
+      }
+    endShape();
+  pop();
+}
+
+const drawCircleLines = () => {
   noFill();
   strokeWeight(bandWidth.value());
   push();
-  translate(width / 2, height / 2);
-  rotate(theta + rotateSlider.value());
-  stroke(colorMe(0), 255, 255);
-  beginShape();
-  for (let i = 0; i < 361; i++) {
-    const magicNumber = Math.floor(i * (512 / 360));
-    const variance = offsetSlider.value() * 1.5;
-    const maxHeight = 50;
-    const r = map(wave[magicNumber], 0, 1, maxHeight, maxHeight + variance);
-    const x = r * cos(i);
-    const y = r * sin(i);
-    vertex(x, y);
-  }
-  endShape();
+    translate(width / 2, height / 2);
+    rotate(theta + rotateSlider.value());
+    stroke(colorMe(0), 255, 255);
+    for (let i = 1; i <= 5; i++) {
+      const distance = i * 50;
+      drawChaos(distance);
+    }
   pop();
 }
 
@@ -306,7 +317,7 @@ function draw() {
   colorProgressBar();
   background(0);
   checkAndReset();
-  drawCircleLines();
+  if (radialWaveCheckbox.checked()) drawCircleLines();
   if (drawCircleCheckbox.checked()) drawCircle();
   if (FFTLineCheckbox.checked()) drawLineFFT();
   if (barsCheckbox.checked()) bars();

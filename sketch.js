@@ -37,7 +37,7 @@ let k = 0;
 
 
 function preload() {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 8; i++) {
     const song = loadSound(`assets/sounds/sound_${i}.mp3`);
     songs.push(song);
     songs[i].setVolume(0.125);
@@ -138,49 +138,28 @@ function createControls() {
   amp = new p5.Amplitude();
 }
 
-// const drawCircleLines = () => {
-//   const wave = fft.waveform();
-//   noFill();
-//   strokeWeight(bandWidth.value());
-//   push();
-//   translate(width / 2, height / 2);
-//   rotate(theta + rotateSlider.value());
-  
-//   for (let i = 0; i < wave.length; i++) {
-//     const r = map(wave[i], 0, 1, 1, height);
-//     const x = r * cos(i);
-//     const y = r * sin(i);
-//     const angle = map(i, 0, 512, 0, 360);
-//     const c = map(i, 0, wave.length, 0, 255);
-//     const offset = 10 * offsetSlider.value();
-//     stroke(colorMe(c), 255, 255);
-//     push();
-//     rotate(angle);
-//     line(offset, 0, x + offset, y);
-//     pop();
-//   }
-//   pop();
-// }
-
 const drawCircleLines = () => {
-  const vol = amp.getLevel();
-  const offset = 10 * offsetSlider.value();
+  const wave = fft.waveform();
   noFill();
   strokeWeight(bandWidth.value());
   push();
   translate(width / 2, height / 2);
   rotate(theta + rotateSlider.value());
-  for (let i = 0; i < 360; i++) {
-    const r = map(vol, 0, 0.25, 10 + (1.5 * offsetSlider.value()), height);
+  stroke(colorMe(0), 255, 255);
+  beginShape();
+  for (let i = 0; i < 361; i++) {
+    const magicNumber = Math.floor(i * (512 / 360));
+    const variance = offsetSlider.value() * 1.5;
+    const maxHeight = 50;
+    const r = map(wave[magicNumber], 0, 1, maxHeight, maxHeight + variance);
     const x = r * cos(i);
     const y = r * sin(i);
-    const c = map(i, 0, 360, 0, 255);
-    stroke(colorMe(c), 255, 255);
-    line(0, 0, x, y);
+    vertex(x, y);
   }
+  endShape();
   pop();
-
 }
+
 
 const drawCircle = () => {
   const vol = amp.getLevel();

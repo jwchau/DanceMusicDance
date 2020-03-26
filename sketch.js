@@ -4,7 +4,7 @@ let song;
 let songIdx;
 let theta = 0;
 let cTheta = 0;
-let omega = 1;
+let omega = -1;
 let cOmega = 1;
 
 //buttons
@@ -140,30 +140,40 @@ function createControls() {
   amp = new p5.Amplitude();
 }
 
-const drawEyeType = (type, diam, amp) => {
+const drawBeziersType0 = (diam, offset, dist) => {
+  let p1 = [diam / 6, diam / 2];
+  let p2 = [diam / 6, offset + diam / 2];
+  let p3 = [diam / 12, 2 * offset + diam / 2];
+  let p4 = [-diam / 12, 3 * offset + diam / 2];
+  bezier(...p1, ...p2, ...p3, ...p4);
+  p1 = [-diam / 6, diam / 2];
+  p2 = [-diam / 6, offset + diam / 2];
+  p3 = [diam / 12, 2 * offset + diam / 2];
+  p4 = [-diam / 12, 3 * offset + diam / 2];
+  bezier(...p1, ...p2, ...p3, ...p4);
+}
+
+const drawType0 = (diam, offset, ang, dist) => {
+  push();
+  translate(width / 2, height / 2);
+  ellipse(0, 0, dist / 2, dist / 2);
+  rotate(theta + rotateSlider.value() + ang);
+  for (let i = 0; i < 3; i++) {
+    rotate(120);
+    fill(colorMe(0), 255, 255);
+    ellipse(0, dist / 4, diam / 6, diam / 6);
+    drawBeziersType0(diam / 2, offset, dist / 2);
+  }
+  pop();
+}
+
+const drawEyeType = (type, diam) => {
+  const offset = map(offsetSlider.value(), 0, 100, 0, 30);
   if (type === 0) {
+    drawType0(diam, offset, 0, diam);
+  } else if (type === 1) {
     for (let i = 0; i < 3; i++) {
-      strokeWeight(bandWidth.value());
-      stroke(colorMe(0), 255, 255);
-      rotate(120);
-      
-      ellipse(0, diam / 2, diam / 3, diam / 3);
-      let p1 = [diam / 6, diam / 2];
-      let p2 = [diam / 6, 60 + diam / 2];
-      let p3 = [diam / 12, 100 + diam / 2];
-      let p4 = [-diam / 12, 140 + diam / 2];
-      bezier(...p1, ...p2, ...p3, ...p4);
-      p1 = [-diam / 6, diam / 2];
-      p2 = [-diam / 6, 60 + diam / 2];
-      p3 = [diam / 12, 100 + diam / 2];
-      p4 = [-diam / 12, 140 + diam / 2];
-      bezier(...p1, ...p2, ...p3, ...p4);
-      // strokeWeight(10);
-      // stroke(255);
-      // point(...p1);
-      // point(...p2);
-      // point(...p3);
-      // point(...p4);
+      drawType0(diam, offset, i * 60, diam * (i + 1));
     }
   }
 
@@ -176,14 +186,7 @@ const nerdOut = () => {
   strokeWeight(bandWidth.value());
   stroke(colorMe(0), 255, 255);
   
-  push();
-    translate(width / 2, height / 2);
-    ellipse(0, 0, diam, diam);
-    rotate(theta + rotateSlider.value());
-
-    drawEyeType(bandSlider.value(), diam);
-
-  pop();
+  drawEyeType(bandSlider.value(), diam);
 }
 
 const drawChaos = (start) => {

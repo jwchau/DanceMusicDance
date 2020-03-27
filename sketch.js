@@ -37,7 +37,7 @@ let k = 0;
 
 
 function preload() {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
     const song = loadSound(`assets/sounds/sound_${i}.mp3`);
     songs.push(song);
     songs[i].setVolume(0.125);

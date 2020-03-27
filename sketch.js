@@ -65,21 +65,103 @@ function togglePlaying() {
   }
 }
 
+const createFFT = () => {
+  fft = new p5.FFT(0.90, 512);
+}
+
+const clearAllSettings = () => {
+  theta = 0;
+  cTheta = 0;
+  volumeSlider.value(0.25);
+  fadeSlider.value(1);
+  colorSlider.value(0);
+  bandSlider.value(0);
+  offsetSlider.value(0);
+  bandWidth.value(0);
+  rotateSlider.value(0);
+  omegaSlider.value(1);
+  rotateCheckbox.checked(false);
+  cycleColors.checked(false);
+  rippleCheckbox.checked(false);
+  radialPatternCheckbox.checked(false);
+  radialWaveCheckbox.checked(false);
+  drawCircleCheckbox.checked(false);
+  barsCheckbox.checked(false);
+  FFTLineCheckbox.checked(false);
+  pointWaveCheckbox.checked(false);
+}
+
+const preset = (k) => () => {
+  clearAllSettings();
+  if (k === 0) {
+    fadeSlider.value(100);
+    cycleColors.checked(true);
+    rippleCheckbox.checked(true);
+  } else if (k === 1) {
+    bandSlider.value(1);
+    offsetSlider.value(100);
+    bandWidth.value(2);
+    rotateCheckbox.checked(true);
+    radialPatternCheckbox.checked(true);
+  } else if (k === 2) {
+    bandSlider.value(3);
+    offsetSlider.value(33);
+    bandWidth.value(4);
+    cycleColors.checked(true);
+    radialWaveCheckbox.checked(true);
+    drawCircleCheckbox.checked(true);
+  } else if (k === 3) {
+    fadeSlider.value(5);
+    bandSlider.value(3);
+    offsetSlider.value(100);
+    cycleColors.checked(true);
+    barsCheckbox.checked(true);
+    FFTLineCheckbox.checked(true);
+    pointWaveCheckbox.checked(true);
+  }
+  return true;
+}
+
 const createButtons = () => {
-  playButton = createButton("play");
+  playButton = createButton("Play");
   playButton.mousePressed(togglePlaying);
   playButton.addClass('control button');
   playButton.id('play');
 
-  prevButton = createButton("prev");
+  prevButton = createButton("Prev");
   prevButton.mousePressed(songPush(-1));
   prevButton.addClass('control button');
   prevButton.id('prev');
 
-  nextButton = createButton("next");
+  nextButton = createButton("Next");
   nextButton.mousePressed(songPush(1));
   nextButton.addClass('control button');
   nextButton.id('next');
+
+  presetButton0 = createButton("Preset 0");
+  presetButton0.mousePressed(preset(0));
+  presetButton0.addClass('control button');
+  presetButton0.id('preset-0');
+
+  presetButton1 = createButton("Preset 1");
+  presetButton1.mousePressed(preset(1));
+  presetButton1.addClass('control button');
+  presetButton1.id('preset-1');
+
+  presetButton2 = createButton("Preset 2");
+  presetButton2.mousePressed(preset(2));
+  presetButton2.addClass('control button');
+  presetButton2.id('preset-2');
+
+  presetButton3 = createButton("Preset 3");
+  presetButton3.mousePressed(preset(3));
+  presetButton3.addClass('control button');
+  presetButton3.id('preset-3');
+
+  clearButton = createButton("Clear");
+  clearButton.mousePressed(preset('clear'));
+  clearButton.addClass('control button');
+  clearButton.id('clear');
 }
 
 const createListeners = () => {
@@ -95,6 +177,9 @@ const createSliders = () => {
   volumeSlider = createSlider(0, 0.5, 0.25, 0.0125);
   volumeSlider.addClass('control slider');
   volumeSlider.id('volume-slider');
+  fadeSlider = createSlider(1, 100, 1, 1);
+  fadeSlider.addClass('control slider');
+  fadeSlider.id('fade-slider');
   colorSlider = createSlider(0, 360, 0, 1);
   colorSlider.addClass('control slider');
   colorSlider.id('color-slider');
@@ -110,6 +195,9 @@ const createSliders = () => {
   rotateSlider = createSlider(0, 360, 0, 1);
   rotateSlider.addClass('control slider');
   rotateSlider.id('rotate-slider');
+  omegaSlider = createSlider(1, 15, 1, 1);
+  omegaSlider.addClass('control slider');
+  omegaSlider.id('omega-slider');
 }
 
 const createCheckboxes = () => {
@@ -118,6 +206,8 @@ const createCheckboxes = () => {
   rotateCheckbox.parent(div);
   cycleColors = createCheckbox('cycle colors', false);
   cycleColors.parent(div);
+  rippleCheckbox = createCheckbox('Ripples', false);
+  rippleCheckbox.parent(div);
   radialPatternCheckbox = createCheckbox('Radial Pattern', false);
   radialPatternCheckbox.parent(div);
   radialWaveCheckbox = createCheckbox('Radial Wave', false);
@@ -130,7 +220,6 @@ const createCheckboxes = () => {
   FFTLineCheckbox.parent(div);
   pointWaveCheckbox = createCheckbox('Point Wave', false);
   pointWaveCheckbox.parent(div);
-  document.body.appendChild(div);
 }
 
 function createControls() {
@@ -328,13 +417,6 @@ const drawLineFFT = () => {
   pop();
 }
 
-
-
-
-const createFFT = () => {
-  fft = new p5.FFT(0.90, 512);
-}
-
 const bars = () => {
   const spectrum = fft.analyze();
   const bw = bandWidth.value();
@@ -357,12 +439,66 @@ const bars = () => {
   pop();
 }
 
+const ripples = new Array(1);
+let rippleIdx = 0;
+
+const fillRipples = () => {
+  for (let i = 0; i < ripples.length; i++) {
+    r = new Array();
+    r.push(random(width) - (width / 2));
+    r.push(random(height) - (height / 2));
+    r.push(0);
+    r.push(random(50, 200));
+    ripples[i] = r;
+  }
+}
+
+const ripple = (i, r) => {
+  let diam = r[2];
+  let limit = r[3];
+  if (diam <= limit) {
+    var fade = map(diam, 0, limit, 1, 0);
+    stroke(colorMe(0), 255, 255, fade);
+    noFill();
+    ellipse(r[0], r[1], diam);
+    r[2] += 1;
+  } else {
+    ripples.splice(i, 1);
+  }
+
+}
+
+const generateRipples = (limit = 1) => {
+  for (let i = 0; i < limit; i++) {
+    r = [];
+    r.push(random(width) - (width / 2)); //x value
+    r.push(random(height) - (height / 2)); //y value
+    r.push(0); //starting size
+    r.push(random(50, 200)); //limit size
+    ripples.push(r);
+  }
+}
+
+const drawRipples = () => {
+  noFill();
+  stroke(255);
+  strokeWeight(bandWidth.value() / 2);
+  push();
+  translate(width / 2, height / 2);
+  rotate(theta + rotateSlider.value());
+  for (let i = 0; i < ripples.length; i++) {
+    ripple(i, ripples[i]);
+  }
+  generateRipples();
+  pop();
+}
+
 const colorMe = (current) => {
   return (current + colorSlider.value() + cTheta) % 256;
 }
 
 const cycles = () => {
-  if (rotateCheckbox.checked()) theta += omega;
+  if (rotateCheckbox.checked()) theta += (omega * omegaSlider.value());
   if (cycleColors.checked()) cTheta += cOmega;
 }
 
@@ -373,20 +509,22 @@ const colorProgressBar = () => {
 
 const checkAndReset = () => {
   if (!song.isPlaying()) playButton.html('play');
+  else playButton.html('paws');
   if (theta > 360) theta = 0;
   if (cTheta >= 255) cOmega = -1;
   if (cTheta <= 0) cOmega = 1;
   cycles();
 }
 
-
 function setup() {
+  song.play();
   pixelDensity(1);
   createCanvas(windowHeight - 100, windowHeight - 100);
   angleMode(DEGREES);
   colorMode(HSB);
   background(0);
   
+  fillRipples();
   createControls();
   createFFT();
   fileUpload();
@@ -396,8 +534,10 @@ function setup() {
 function draw() {
   song.setVolume(volumeSlider.value());
   colorProgressBar();
-  background(0);
   checkAndReset();
+  noStroke();
+  background(0, 0, 0, 1 / fadeSlider.value());
+  if (rippleCheckbox.checked()) drawRipples();
   if (radialPatternCheckbox.checked()) nerdOut();
   if (radialWaveCheckbox.checked()) drawCircleLines();
   if (drawCircleCheckbox.checked()) drawCircle();
@@ -436,8 +576,8 @@ const structureMe = () => {
   attachById('offset-label', 'offset-slider');
   attachById('bandWidth-label', 'bandWidth-slider');
   attachById('rotate-label', 'rotate-slider');
-  
-  attachById('controls', 'checkboxes');
+  attachById('omega-label', 'omega-slider');
+  attachById('fade-label', 'fade-slider');
 
   attachByClass('buttons', 'button');
 }

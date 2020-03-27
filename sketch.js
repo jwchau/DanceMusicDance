@@ -37,7 +37,7 @@ let k = 0;
 
 
 function preload() {
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 5; i++) {
     const song = loadSound(`assets/sounds/sound_${i}.mp3`);
     songs.push(song);
     songs[i].setVolume(0.125);
@@ -284,6 +284,27 @@ const drawType2 = (diam, offset) => {
   pop();
 }
 
+const drawType3 = (diam, offset) => {
+  push();
+  const wave = fft.waveform();
+  const size = map(wave[69], -1, 1, -100, 100);
+  translate(width / 2, height / 2);
+  fill(colorMe(0), 255, 255);
+  ellipse(0, 0, size + diam / 4, size + diam / 4);
+  rotate(theta + rotateSlider.value());
+  noFill();
+  push();
+  for (let i = 0; i < 4; i++) {
+    const size = map(wave[i * 100], -1, 1, -10 * offset, 10 * offset);
+    
+    rotate(45);
+    ellipse(0, 0, (size + diam) / 2, height);
+  }
+  pop();
+  
+  pop();
+}
+
 const drawEyeType = (type, diam) => {
   const offset = map(offsetSlider.value(), 0, 100, 0, 30);
   if (type === 0) {
@@ -294,6 +315,8 @@ const drawEyeType = (type, diam) => {
     }
   } else if (type === 2) {
     drawType2(diam, offset);
+  } else if (type === 3) {
+    drawType3(diam, offset);
   }
 
 }

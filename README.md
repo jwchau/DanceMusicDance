@@ -31,17 +31,15 @@ The demo is live [HERE](https://jwchau.github.io/DanceMusicDance)
 
 ## Challenges
 
-* Due to the large amount of data this project naturally encompasses I needed a programmative solution to seed the database.
-* The Active Storage and AWS S3 implementation was very buggy and I still don't full understand the inner workings of how rails does it's magic.
-* HTML structure and CSS matching were difficult because imdb.com is not very reliant on React.js so I had to create, yet imitate the same look the original site has.
-
+* The creativity aspect of this project had me hit a wall sometimes, because there's so many different ways to visualize MUSIC, let alone just one sound at a moment in time.
+* The math for some of the drawings were a bit weird, and I still don't have 100% understanding of it. Coordinate space, distance calculations, timing, loops, etc.
+* HTML structure and CSS matching were difficult to figure out because I used p5 in global mode, which creates html elements and appends it to the body. So I had to individually attach to the appropriate containers I created.
 ## Author
 
 * **John Chau** - [github](https://github.com/jwchau)
 
 ## My thoughts about the project
 
-* Overall I felt it was a great learning experience for fullstack implementation.
-* The repetition of React/Redux -> Rails pattern really help drill the frontend to backend integration pattern.
-* I felt a little slow during development and didn't get to finish as much functionality as I thought I would.
-* As I continue this project I will update my thoughts about it.
+* Overall I felt it was a pretty fun project to do. I definitely solidified my understanding of pure JavaScript.
+* I certainly felt the arduous process of repeatedly hard coding things like buttons and checkboxes. If I could go back in time and redo, I would make it more modular.
+* I felt pretty relaxed during development as this wasn't a strict structure by any means. I think that's an important mindset to be in while developing or else one would be tied down by specifics of every detail.

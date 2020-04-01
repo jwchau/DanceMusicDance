@@ -3188,6 +3188,7 @@ function loadAudioWorkletModules() {
       type: 'application/javascript'
     });
     var objectURL = URL.createObjectURL(blob);
+    debugger
     return ac.audioWorklet.addModule(objectURL);
   }));
 }

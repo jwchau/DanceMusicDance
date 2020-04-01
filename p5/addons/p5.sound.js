@@ -3180,6 +3180,7 @@ var p5sound = __webpack_require__(1);
 
 var moduleSources = [__webpack_require__(37)["default"], __webpack_require__(38)["default"], __webpack_require__(39)["default"]];
 var ac = p5sound.audiocontext;
+debugger
 var initializedAudioWorklets = false;
 
 function loadAudioWorkletModules() {
@@ -3188,7 +3189,7 @@ function loadAudioWorkletModules() {
       type: 'application/javascript'
     });
     var objectURL = URL.createObjectURL(blob);
-    ac.audioWorklet = {};
+    debugger
     return ac.audioWorklet.addModule(objectURL);
   }));
 }

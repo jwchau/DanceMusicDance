@@ -37,7 +37,7 @@ let k = 0;
 
 
 function preload() {
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     const song = loadSound(`assets/sounds/sound_${i}.mp3`);
     songs.push(song);
     songs[i].setVolume(0.125);
@@ -58,7 +58,7 @@ const songPush = (k) => () => {
 function togglePlaying() {
   if (!song.isPlaying()) {
     song.play();
-    playButton.html("paws");
+    playButton.html("pause");
   } else {
     song.pause();
     playButton.html("play");
@@ -169,6 +169,13 @@ const createListeners = () => {
   progressBar.addEventListener("mousedown", function(e) {
     let clickedPos = e.clientX - e.target.offsetLeft;
     song.jump((clickedPos / e.target.offsetWidth) * song.duration());
+  }, false);
+
+  const splash = document.getElementById('splash');
+  const iButton = document.getElementById('i-button');
+  iButton.addEventListener("click", function(e) {
+    e.preventDefault();
+    splash.style.display = 'none';
   }, false);
 }
 
@@ -532,7 +539,7 @@ const colorProgressBar = () => {
 
 const checkAndReset = () => {
   if (!song.isPlaying()) playButton.html('play');
-  else playButton.html('paws');
+  else playButton.html('pause');
   if (theta > 360) theta = 0;
   if (cTheta >= 255) cOmega = -1;
   if (cTheta <= 0) cOmega = 1;
@@ -540,7 +547,6 @@ const checkAndReset = () => {
 }
 
 function setup() {
-  song.play();
   pixelDensity(1);
   createCanvas(windowHeight - 100, windowHeight - 100);
   angleMode(DEGREES);

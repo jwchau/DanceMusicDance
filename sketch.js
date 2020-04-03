@@ -43,7 +43,7 @@ function preload() {
     songs[i].setVolume(0.125);
   }
   songIdx = Math.floor(Math.random() * songs.length);
-  song = songs[songIdx];
+  song = songs[3];
 }
 
 const songPush = (k) => () => {

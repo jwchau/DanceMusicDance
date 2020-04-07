@@ -177,6 +177,21 @@ const createListeners = () => {
     e.preventDefault();
     splash.style.display = 'none';
   }, false);
+
+  const show = document.getElementById('show-controls');
+  const controls = document.getElementById('controls');
+  show.addEventListener("click", function(e) {
+    e.preventDefault();
+    if (controls.style.display === 'none') {
+      controls.style.display = 'flex';
+      show.children[0].classList.replace('left', 'right');
+      resizeCanvas(windowHeight, windowHeight - 74);
+    } else {
+      controls.style.display = 'none';
+      show.children[0].classList.replace('right', 'left');
+      resizeCanvas(windowWidth, windowHeight - 74);
+    }
+  }, false);
 }
 
 
@@ -548,7 +563,7 @@ const checkAndReset = () => {
 
 function setup() {
   pixelDensity(1);
-  createCanvas(windowHeight, windowHeight - 74);
+  createCanvas(windowHeight, windowHeight - 70);
   angleMode(DEGREES);
   colorMode(HSB);
   background(0);

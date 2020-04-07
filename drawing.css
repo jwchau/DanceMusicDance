@@ -1,10 +1,13 @@
+html {
+  height: 100%;
+}
+
 /* body css */
 body {
   background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(45,152,253,1) 100%);
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
+  align-items: flex-start;
 }
 
 /* splash */
@@ -32,10 +35,6 @@ body {
   margin: 10px;
 }
 
-/* sketch css */
-#sketch {
-  height: 100%;
-}
 
 #sketch > h1 {
   font-size: 24px;

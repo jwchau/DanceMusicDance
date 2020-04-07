@@ -548,7 +548,7 @@ const checkAndReset = () => {
 
 function setup() {
   pixelDensity(1);
-  createCanvas(windowHeight - 100, windowHeight - 100);
+  createCanvas(windowHeight, windowHeight - 74);
   angleMode(DEGREES);
   colorMode(HSB);
   background(0);

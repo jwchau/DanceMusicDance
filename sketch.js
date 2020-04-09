@@ -553,8 +553,8 @@ const colorProgressBar = () => {
 }
 
 const checkAndReset = () => {
-  if (!song.isPlaying()) playButton.html('play');
-  else playButton.html('pause');
+  if (!song.isPlaying()) playButton.html('Play');
+  else playButton.html('Pause');
   if (theta > 360) theta = 0;
   if (cTheta >= 255) cOmega = -1;
   if (cTheta <= 0) cOmega = 1;

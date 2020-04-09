@@ -21,6 +21,65 @@ The demo is live [HERE](https://jwchau.github.io/DanceMusicDance)
  * Variety different visual styles
  * Incorporates FFT, Waveform, Amplitude sound analysis tools to help better visualize the music!
  * Very interactable! There's a slider, checkbox, or button for all your interactible needs!
+ 
+### Code
+```
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.addEventListener("mousedown", function(e) {
+    let clickedPos = e.clientX - e.target.offsetLeft;
+    song.jump((clickedPos / e.target.offsetWidth) * song.duration());
+  }, false);
+```
+Track seeking code integrates event listener on html element
+
+```
+  const vol = amp.getLevel();
+  volData.push(vol);
+  noFill();
+  strokeWeight(bandWidth.value());
+  stroke(colorMe(0), 255, 255);
+  push();
+  translate(width / 2, height / 2);
+  rotate(theta + rotateSlider.value());
+  beginShape();
+  for (let i = 0; i < volData.length; i++) {
+    const r = map(volData[i], 0, 0.25, 10 + (1.5 * offsetSlider.value()), height);
+    const x = r * cos(i);
+    const y = r * sin(i);
+    const c = map(i, 0, volData.length, 0, 255);
+    vertex(x, y);
+  }
+  endShape();
+  pop();
+
+  if (volData.length > 360) volData.splice(0, 1);
+```
+Rotating Circle drawing is made of 360 points, constantly being pushed into an array based on current music amplitude.
+
+```
+const bars = () => {
+  const spectrum = fft.analyze();
+  const bw = bandWidth.value();
+  noStroke();
+  push();
+  translate(width / 2, height / 2);
+  rotate(rotateSlider.value() + theta);
+  for (let i = 0; i < spectrum.length; i += bw) {
+    const amp = spectrum[i];
+    const x = map(i, 0, spectrum.length, -width / 2, 0);
+    const y = map(amp, 0, 256, 1, height - 100);
+    const c = map(i, 0, spectrum.length, 0, 255);
+    const color = colorMe(c);
+    fill(color, 255, 255);
+    rect(x, 0, bw, y);
+    rect(x, 0, bw, -y);
+    rect(-x, 0, bw, y);
+    rect(-x, 0, bw, -y);
+  }
+  pop();
+}
+```
+Bars are drawn with rectangles. Length is based on FFT spectrum and width is based on a width slider.
 
 ### screenshots
 
@@ -36,7 +95,7 @@ The demo is live [HERE](https://jwchau.github.io/DanceMusicDance)
 * HTML structure and CSS matching were difficult to figure out because I used p5 in global mode, which creates html elements and appends it to the body. So I had to individually attach to the appropriate containers I created.
 ## Author
 
-* **John Chau** - [github](https://github.com/jwchau)
+* **John Chau** - [personal site](https://john-chau.com) [github](https://github.com/jwchau)
 
 ## My thoughts about the project
 

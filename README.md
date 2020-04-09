@@ -95,7 +95,7 @@ Bars are drawn with rectangles. Length is based on FFT spectrum and width is bas
 * HTML structure and CSS matching were difficult to figure out because I used p5 in global mode, which creates html elements and appends it to the body. So I had to individually attach to the appropriate containers I created.
 ## Author
 
-* **John Chau** - [github](https://github.com/jwchau)
+* **John Chau** - [personal site](https://john-chau.com) [github](https://github.com/jwchau)
 
 ## My thoughts about the project
 

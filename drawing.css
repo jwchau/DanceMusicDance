@@ -121,7 +121,7 @@ i {
 
 /* buttons */
 #buttons > * {
-  margin: 0 5px;
+  margin: 5px;
   font-size: 18px;
   cursor: pointer;
   padding: 5px;
@@ -132,6 +132,12 @@ i {
     color 0.1s ease-in-out,
     text-shadow 0.1s ease-in-out,
     box-shadow 0.1s ease-in-out;
+}
+
+#play {
+  /* background-color: red; */
+  background-color: rgb(255, 92, 92);
+  box-shadow: 0 0 10px 3px cyan;
 }
 
 #buttons > *:hover {

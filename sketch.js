@@ -58,10 +58,10 @@ const songPush = (k) => () => {
 function togglePlaying() {
   if (!song.isPlaying()) {
     song.play();
-    playButton.html("pause");
+    playButton.html("Pause");
   } else {
     song.pause();
-    playButton.html("play");
+    playButton.html("Play");
   }
 }
 
@@ -234,7 +234,7 @@ const createCheckboxes = () => {
   radialPatternCheckbox.parent(div);
   radialWaveCheckbox = createCheckbox('Radial Wave', false);
   radialWaveCheckbox.parent(div);
-  drawCircleCheckbox = createCheckbox('Radial Map', false);
+  drawCircleCheckbox = createCheckbox('Radial Map', true);
   drawCircleCheckbox.parent(div);
   barsCheckbox = createCheckbox('Bars', false);
   barsCheckbox.parent(div);

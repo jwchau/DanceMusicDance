@@ -211,7 +211,7 @@ const createSliders = () => {
   offsetSlider = createSlider(10, 100, 0, 5);
   offsetSlider.addClass('control slider');
   offsetSlider.id('offset-slider');
-  bandWidth = createSlider(2, 64, 16, 2);
+  bandWidth = createSlider(2, 64, 4, 2);
   bandWidth.addClass('control slider');
   bandWidth.id('bandWidth-slider');
   rotateSlider = createSlider(0, 360, 0, 1);
@@ -226,7 +226,7 @@ const createCheckboxes = () => {
   const div = document.getElementById('checkboxes');
   rotateCheckbox = createCheckbox('auto-rotate', false);
   rotateCheckbox.parent(div);
-  cycleColors = createCheckbox('cycle colors', false);
+  cycleColors = createCheckbox('cycle colors', true);
   cycleColors.parent(div);
   rippleCheckbox = createCheckbox('Ripples', false);
   rippleCheckbox.parent(div);
@@ -234,9 +234,9 @@ const createCheckboxes = () => {
   radialPatternCheckbox.parent(div);
   radialWaveCheckbox = createCheckbox('Radial Wave', false);
   radialWaveCheckbox.parent(div);
-  drawCircleCheckbox = createCheckbox('Radial Map', true);
+  drawCircleCheckbox = createCheckbox('Radial Map', false);
   drawCircleCheckbox.parent(div);
-  barsCheckbox = createCheckbox('Bars', false);
+  barsCheckbox = createCheckbox('Bars', true);
   barsCheckbox.parent(div);
   FFTLineCheckbox = createCheckbox('FFT Line', false);
   FFTLineCheckbox.parent(div);

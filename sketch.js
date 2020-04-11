@@ -28,14 +28,6 @@ let cycleColors;
 let amp;
 let fft;
 
-//init data
-const volData = [0];
-for (let i = 0; i < 360; i++) {
-  volData.push(0);
-}
-let k = 0;
-
-
 function preload() {
   for (let i = 0; i < 4; i++) {
     const song = loadSound(`assets/sounds/sound_${i}.mp3`);
@@ -234,7 +226,7 @@ const createCheckboxes = () => {
   radialPatternCheckbox.parent(div);
   radialWaveCheckbox = createCheckbox('Radial Wave', false);
   radialWaveCheckbox.parent(div);
-  drawCircleCheckbox = createCheckbox('Radial Map', false);
+  drawCircleCheckbox = createCheckbox('Radial Expanse', false);
   drawCircleCheckbox.parent(div);
   barsCheckbox = createCheckbox('Bars', true);
   barsCheckbox.parent(div);
@@ -386,26 +378,7 @@ const drawCircleLines = () => {
 
 
 const drawCircle = () => {
-  const vol = amp.getLevel();
-  volData.push(vol);
-  noFill();
-  strokeWeight(bandWidth.value());
-  stroke(colorMe(0), 255, 255);
-  push();
-  translate(width / 2, height / 2);
-  rotate(theta + rotateSlider.value());
-  beginShape();
-  for (let i = 0; i < volData.length; i++) {
-    const r = map(volData[i], 0, 0.25, 10 + (1.5 * offsetSlider.value()), height);
-    const x = r * cos(i);
-    const y = r * sin(i);
-    const c = map(i, 0, volData.length, 0, 255);
-    vertex(x, y);
-  }
-  endShape();
-  pop();
-
-  if (volData.length > 360) volData.splice(0, 1);
+  
 }
 
 const pointWave = () => {

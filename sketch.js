@@ -58,7 +58,7 @@ function togglePlaying() {
 }
 
 const createFFT = () => {
-  fft = new p5.FFT(0.90, 512);
+  fft = new p5.FFT(0.9, 512);
 }
 
 const clearAllSettings = () => {
@@ -86,9 +86,10 @@ const clearAllSettings = () => {
 const preset = (k) => () => {
   clearAllSettings();
   if (k === 0) {
-    fadeSlider.value(100);
+    fadeSlider.value(10);
+    bandWidth.value(4);
     cycleColors.checked(true);
-    rippleCheckbox.checked(true);
+    barsCheckbox.checked(true);
   } else if (k === 1) {
     bandSlider.value(1);
     offsetSlider.value(100);
@@ -191,19 +192,19 @@ const createSliders = () => {
   volumeSlider = createSlider(0, 0.5, 0.25, 0.0125);
   volumeSlider.addClass('control slider');
   volumeSlider.id('volume-slider');
-  fadeSlider = createSlider(1, 100, 1, 1);
+  fadeSlider = createSlider(1, 100, 5, 1);
   fadeSlider.addClass('control slider');
   fadeSlider.id('fade-slider');
-  colorSlider = createSlider(0, 360, 0, 1);
+  colorSlider = createSlider(0, 255, 150, 1);
   colorSlider.addClass('control slider');
   colorSlider.id('color-slider');
-  bandSlider = createSlider(0, 3, 0, 1);
+  bandSlider = createSlider(0, 3, 3, 1);
   bandSlider.addClass('control slider');
   bandSlider.id('band-slider');
-  offsetSlider = createSlider(10, 100, 0, 5);
+  offsetSlider = createSlider(10, 100, 50, 5);
   offsetSlider.addClass('control slider');
   offsetSlider.id('offset-slider');
-  bandWidth = createSlider(2, 64, 4, 2);
+  bandWidth = createSlider(2, 64, 6, 2);
   bandWidth.addClass('control slider');
   bandWidth.id('bandWidth-slider');
   rotateSlider = createSlider(0, 360, 0, 1);
@@ -218,7 +219,7 @@ const createCheckboxes = () => {
   const div = document.getElementById('checkboxes');
   rotateCheckbox = createCheckbox('auto-rotate', false);
   rotateCheckbox.parent(div);
-  cycleColors = createCheckbox('cycle colors', true);
+  cycleColors = createCheckbox('cycle colors', false);
   cycleColors.parent(div);
   rippleCheckbox = createCheckbox('Ripples', false);
   rippleCheckbox.parent(div);
@@ -226,9 +227,9 @@ const createCheckboxes = () => {
   radialPatternCheckbox.parent(div);
   radialWaveCheckbox = createCheckbox('Radial Wave', false);
   radialWaveCheckbox.parent(div);
-  drawCircleCheckbox = createCheckbox('Radial Expanse', false);
+  drawCircleCheckbox = createCheckbox('Radial Expanse', true);
   drawCircleCheckbox.parent(div);
-  barsCheckbox = createCheckbox('Bars', true);
+  barsCheckbox = createCheckbox('Bars', false);
   barsCheckbox.parent(div);
   FFTLineCheckbox = createCheckbox('FFT Line', false);
   FFTLineCheckbox.parent(div);
@@ -309,13 +310,12 @@ const drawType3 = (diam, offset) => {
   noFill();
   push();
   for (let i = 0; i < 4; i++) {
-    const size = map(wave[i * 100], -1, 1, -10 * offset, 10 * offset);
+    const size = map(wave[i * 100], -1, 1, -10 * (offset * 5), 10 * (offset * 5));
     
     rotate(45);
     ellipse(0, 0, (size + diam) / 2, height);
   }
   pop();
-  
   pop();
 }
 
@@ -352,8 +352,9 @@ const drawChaos = (start) => {
     beginShape();
       for (let i = 0; i < 360; i++) {
         const magicNumber = Math.floor(i * (512 / 360)) + 1;
-        const variance = offsetSlider.value() * 1.5;
-        const r = map(wave[magicNumber], -1, 1, start, start + ((bandSlider.value() + 1) * variance));
+        const variance = offsetSlider.value() * 3;
+        const bandMult = (bandSlider.value() + 1) * 25;
+        const r = map(wave[magicNumber], 0, 1, start + bandMult, bandMult + start + variance);
         const x = r * cos(i);
         const y = r * sin(i);
         vertex(x, y);
@@ -378,7 +379,24 @@ const drawCircleLines = () => {
 
 
 const drawCircle = () => {
-  
+  const spectrum = fft.analyze();
+  const bw = bandWidth.value();
+  const offset = offsetSlider.value() * 2.5;
+  const numBands = bandSlider.value() * 20;
+
+  noFill();
+  strokeWeight(bw);
+  push();
+  translate(width / 2, height / 2);
+  for (let i = 0; i < spectrum.length; i += bw + numBands) {
+    const amp = spectrum[i];
+    const size = map(amp, 0, 255, 0, height);
+    const c = map(i, 0, spectrum.length, 0, 255);
+    const color = colorMe(c);
+    stroke(color, 255, 255);
+    ellipse(0, 0, size + offset, offset + size);
+  }
+  pop();
 }
 
 const pointWave = () => {
@@ -423,7 +441,7 @@ const drawLineFFT = () => {
   for (let i = 0; i < spectrum.length; i += bw) {
     const amp = spectrum[i];
     const x = map(i, 0, spectrum.length, -width / 2 + 100, 0);
-    const y = map(amp, 0, 256, 0, -height / 2);
+    const y = map(amp, 0, 255, 0, -height / 2);
     const c = map(i, 0, spectrum.length, 0, 255);
     const color = colorMe(c);
     stroke(color, 255, 255);
@@ -445,7 +463,7 @@ const bars = () => {
   for (let i = 0; i < spectrum.length; i += bw) {
     const amp = spectrum[i];
     const x = map(i, 0, spectrum.length, -width / 2, 0);
-    const y = map(amp, 0, 256, 1, height - 100);
+    const y = map(amp, 0, 255, 1, height - 100);
     const c = map(i, 0, spectrum.length, 0, 255);
     const color = colorMe(c);
     fill(color, 255, 255);

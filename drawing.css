@@ -33,6 +33,10 @@ body {
   margin: 10px;
 }
 
+#instructions > #i-loading {
+  color: rgb(12, 241, 241);
+}
+
 
 #sketch > h1 {
   font-size: 24px;

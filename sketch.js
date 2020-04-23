@@ -616,6 +616,13 @@ const structureMe = () => {
 
   attachByClass('buttons', 'button');
   attachByClass('song-buttons', 'song-button');
+
+  replaceLoading();
+}
+
+const replaceLoading = () => {
+  const loadingP = document.querySelector('#i-loading');
+  loadingP.parentNode.removeChild(loadingP);
 }
 
 const fileUpload = () => {

@@ -120,7 +120,7 @@ i {
 }
 
 /* buttons */
-#buttons > * {
+#buttons > *:not(#song-buttons) {
   margin: 5px;
   font-size: 18px;
   cursor: pointer;
@@ -134,13 +134,39 @@ i {
     box-shadow 0.1s ease-in-out;
 }
 
-#play {
-  /* background-color: red; */
-  background-color: rgb(255, 92, 92);
-  box-shadow: 0 0 10px 3px cyan;
+#song-buttons {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
-#buttons > *:hover {
+#song-buttons > .song-button {
+  font-size: 20px;
+  padding: 2px;
+  border-radius: 5px;
+  border: 2px groove black;
+  transition: 
+    color 0.1s ease-in-out,
+    text-shadow 0.1s ease-in-out,
+    box-shadow 0.1s ease-in-out;
+}
+
+#song-buttons > *:hover {
+  background-color: transparent;
+  color: white;
+  text-shadow: 0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #FFF, 0 0 20px #49ff18, 0 0 30px #49FF18, 0 0 40px #49FF18, 0 0 55px #49FF18, 0 0 75px #49ff18;
+  box-shadow: 0 0 10px 3px white;
+}
+
+#play {
+  background-color: rgba(252, 7, 7, 0.911);
+  box-shadow: 0 0 10rgba(226, 92, 92, 0.849);
+  width: 50px;
+}
+
+#buttons > *:hover:not(#song-buttons) {
   background-color: transparent;
   color: white;
   text-shadow: 0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #FFF, 0 0 20px #49ff18, 0 0 30px #49FF18, 0 0 40px #49FF18, 0 0 55px #49FF18, 0 0 75px #49ff18;

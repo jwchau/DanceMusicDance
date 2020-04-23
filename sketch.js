@@ -39,21 +39,21 @@ function preload() {
 }
 
 const songPush = (k) => () => {
+  song.jump(0);
   song.stop();
   songIdx += k;
   if (songIdx === songs.length) songIdx = 0;
   if (songIdx < 0) songIdx = songs.length - 1;
   song = songs[songIdx];
-  song.play();
 }
 
 function togglePlaying() {
   if (!song.isPlaying()) {
     song.play();
-    playButton.html("Pause");
+    playButton.html("||");
   } else {
     song.pause();
-    playButton.html("Play");
+    playButton.html("&#9658;");
   }
 }
 
@@ -116,19 +116,19 @@ const preset = (k) => () => {
 }
 
 const createButtons = () => {
-  playButton = createButton("Play");
-  playButton.mousePressed(togglePlaying);
-  playButton.addClass('control button');
-  playButton.id('play');
-
   prevButton = createButton("Prev");
   prevButton.mousePressed(songPush(-1));
-  prevButton.addClass('control button');
+  prevButton.addClass('control song-button');
   prevButton.id('prev');
+
+  playButton = createButton("&#9658;");
+  playButton.mousePressed(togglePlaying);
+  playButton.addClass('control song-button');
+  playButton.id('play');
 
   nextButton = createButton("Next");
   nextButton.mousePressed(songPush(1));
-  nextButton.addClass('control button');
+  nextButton.addClass('control song-button');
   nextButton.id('next');
 
   presetButton0 = createButton("Preset 0");
@@ -544,8 +544,8 @@ const colorProgressBar = () => {
 }
 
 const checkAndReset = () => {
-  if (!song.isPlaying()) playButton.html('Play');
-  else playButton.html('Pause');
+  if (!song.isPlaying()) playButton.html('&#9658;');
+  else playButton.html('&#10074;&#10074;');
   if (theta > 360) theta = 0;
   if (cTheta >= 255) cOmega = -1;
   if (cTheta <= 0) cOmega = 1;
@@ -615,6 +615,7 @@ const structureMe = () => {
   attachById('fade-label', 'fade-slider');
 
   attachByClass('buttons', 'button');
+  attachByClass('song-buttons', 'song-button');
 }
 
 const fileUpload = () => {

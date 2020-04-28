@@ -39,12 +39,17 @@ function preload() {
 }
 
 const songPush = (k) => () => {
-  song.jump(0);
-  song.stop();
+  let wasPlaying = false;
+  if (song.isPlaying()) {
+    song.jump(0);
+    song.stop();
+    wasPlaying = true;
+  }
   songIdx += k;
   if (songIdx === songs.length) songIdx = 0;
   if (songIdx < 0) songIdx = songs.length - 1;
   song = songs[songIdx];
+  if (wasPlaying) song.play();
 }
 
 function togglePlaying() {

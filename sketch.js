@@ -39,9 +39,9 @@ function preload() {
 }
 
 const songPush = (k) => () => {
+  song.jump(0);
   let wasPlaying = false;
   if (song.isPlaying()) {
-    song.jump(0);
     song.stop();
     wasPlaying = true;
   }
